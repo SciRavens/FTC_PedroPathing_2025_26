@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.pedroPathing.examples;
+package org.firstinspires.ftc.teamcode.pedroPathing.TeamCode;
 
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -8,12 +8,7 @@ public class Claw {
     double close_pos;
     double open_pos;
     double open_wide_pos;
-    private double cur_pos;
-
-    public void setPosAbsolute(double pos) {
-        servo.setPosition(pos);
-        cur_pos = pos;
-    }
+    private double cur_pos = 0.0;
 
 
     public Claw(Robot robot) {
@@ -54,7 +49,10 @@ public class Claw {
     public double getCurPos() {
         return cur_pos;
     }
+    public void setPosAbsolute(double pos) {
+        servo.setPosition(pos);
+        cur_pos = pos;
+    }
+
 
 }
-
-

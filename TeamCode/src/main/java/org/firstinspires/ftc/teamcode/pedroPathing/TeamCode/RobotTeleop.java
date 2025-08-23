@@ -81,63 +81,6 @@ public class RobotTeleop extends OpMode {
         robot.telemetry.update();
     }
 
-    private void follower_operate() {
-        boolean strafeOnly = false;
-        double xInput = Math.abs(gamepad1.left_stick_x) > DEAD_ZONE ? gamepad1.left_stick_x : 0;
-        double yInput = Math.abs(gamepad1.left_stick_y) > DEAD_ZONE ? gamepad1.left_stick_y : 0;
-
-        if (gamepad1.right_trigger > 0.5) {
-            follower.setMaxPower(0.25);
-        } else if (gamepad1.left_trigger > 0.5) {
-            strafeOnly = true;
-            if (!strafeHeadingOn) {
-                strafeHeading = follower.getPose().getHeading();
-            }
-            // Heading correction
-            double imuHeading = follower.getPose().getHeading();
-            double headingError = strafeHeading - imuHeading; // Target heading is initialized when strafing starts
-            double correction = Kp_strafing * headingError;
-
-            // Adjust movement with IMU and drift correction
-            follower.setTeleOpMovementVectors(xInput, yInput, correction);
-        } else {
-            follower.setMaxPower(1.0);
-        }
-        if (!strafeOnly) {
-            strafeHeadingOn = false;
-            follower.setTeleOpMovementVectors(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x);
-        }
-        follower.update();
-
-        if (gamepad2.dpad_down) {
-            arm.setPosSampleTwo(false);
-            wrist.setPosSampleTwo(false);
-        } else if (gamepad2.y) {
-            arm.setPosBasket(false);
-            wrist.setPosBasket(false);
-//                clawAngle.setHorizontal();
-//                slider.HighBasket();
-        } else if (gamepad2.x) {
-//                clawAngle.setHorizontal();
-            arm.setPosStarting(false);
-            wrist.setPosStarting(false);
-//                slider.InitialPose();
-        } else if (gamepad2.b) {
-            arm.setPosSpecimen(false);
-            wrist.setPosSpecimen(false);
-        } else if (gamepad2.a) {
-            arm.setPosSample(false);
-            wrist.setPosSample(false);
-        } else if (gamepad2.dpad_left) {
-//                clawAngle.setHorizontal();
-        } else if (gamepad2.dpad_right) {
-//                clawAngle.setVertical();
-        } else if (gamepad2.dpad_up) {
-//                slider.LowChamber();
-            arm.setPosChamberBack(false);
-            wrist.setPosChamberBack(false);
-        }
-    }
 
     public Pose testPath = new Pose(-40,20,Math.toRadians(90));
     public PathChain randomPath;
@@ -190,6 +133,35 @@ public class RobotTeleop extends OpMode {
 
         /* Update Telemetry to the Driver Hub */
         telemetry.update();
+
+        if (gamepad2.dpad_down) {
+            arm.setPosSampleTwo(false);
+            wrist.setPosSampleTwo(false);
+        } else if (gamepad2.y) {
+            arm.setPosBasket(false);
+            wrist.setPosBasket(false);
+//                clawAngle.setHorizontal();
+//                slider.HighBasket();
+        } else if (gamepad2.x) {
+//                clawAngle.setHorizontal();
+            arm.setPosStarting(false);
+            wrist.setPosStarting(false);
+//                slider.InitialPose();
+        } else if (gamepad2.b) {
+            arm.setPosSpecimen(false);
+            wrist.setPosSpecimen(false);
+        } else if (gamepad2.a) {
+            arm.setPosSample(false);
+            wrist.setPosSample(false);
+        } else if (gamepad2.dpad_left) {
+//                clawAngle.setHorizontal();
+        } else if (gamepad2.dpad_right) {
+//                clawAngle.setVertical();
+        } else if (gamepad2.dpad_up) {
+//                slider.LowChamber();
+            arm.setPosChamberBack(false);
+            wrist.setPosChamberBack(false);
+        }
 
     }
 

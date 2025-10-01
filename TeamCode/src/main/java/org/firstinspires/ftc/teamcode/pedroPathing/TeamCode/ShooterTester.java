@@ -31,7 +31,11 @@ import com.pedropathing.follower.Follower;
 
 @TeleOp(name = "ShooterTester", group = "Examples")
 public class ShooterTester extends OpMode {
+    public Robot robot;
+
     public DcMotorEx DcMotorShooter;
+    private static double DEAD_ZONE = 0.1;
+
 
     public void BallShooterFar() {
         DcMotorShooter.setPower(0.6);
@@ -43,19 +47,23 @@ public class ShooterTester extends OpMode {
 
     @Override
     public void init() {
-        DcMotorShooter = hardwareMap.get(DcMotorEx.class, "rightRear");
+
+        DcMotorShooter = hardwareMap.get(DcMotorEx.class, "shooterMotor");
 
         DcMotorShooter.setDirection(DcMotorSimple.Direction.FORWARD);
     }
 
     @Override
     public void loop() {
+        if(gamepad1.left_stick_y != 0){
+            DcMotorShooter.setPower(-gamepad1.left_stick_y);
+        }
         if (gamepad1.a) {
             BallShooterFar();
         } else if (gamepad1.b) {
             BallShooterNear();
         } else {
-            DcMotorShooter.setPower(0);
+           // DcMotorShooter.setPower(0);
         }
     }
 }

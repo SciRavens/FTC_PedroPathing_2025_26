@@ -47,6 +47,7 @@ public class Robot {
     public DcMotor leftFront = null; // Front Left
     public DcMotor rightRear = null; // Back Right
     public DcMotor leftRear = null; // Back Left
+    public DcMotorEx shooterMotor; //shooter
 
     public DcMotorEx motorSlider; // Slider
     public Servo servoArmLeft; // Elbow or Arm

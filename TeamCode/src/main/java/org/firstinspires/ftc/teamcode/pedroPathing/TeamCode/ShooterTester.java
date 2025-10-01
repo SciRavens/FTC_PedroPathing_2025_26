@@ -34,6 +34,10 @@ public class ShooterTester extends OpMode {
     public Robot robot, telemetry;
 
     public DcMotorEx DcMotorShooter;
+    public Turret turret;
+    public double initialTurretPose = 0.5;
+    public double currentTurretPose = initialTurretPose;
+    public double incTurret = 0.25;
     private static double DEAD_ZONE = 0.1;
 
 
@@ -62,13 +66,27 @@ public class ShooterTester extends OpMode {
             DcMotorShooter.setVelocity(-gamepad1.left_stick_y);
             double currentVelocity = DcMotorShooter.getVelocity();
             robot.telemetry.addData("Current RPM: ", currentVelocity);
+            robot.telemetry.update();
         }
-        if (gamepad1.a) {
+        else if (gamepad1.a) {
             BallShooterFar();
-        } else if (gamepad1.b) {
+        }
+        else if (gamepad1.b) {
             BallShooterNear();
-        } else {
-           // DcMotorShooter.setPower(0);
+        }
+        else if (gamepad1.dpad_left){
+            if (currentTurretPose < 0.9) {
+                currentTurretPose += incTurret;
+            }
+        }
+        else if (gamepad1.dpad_right) {
+            if (currentTurretPose > 0.1) {
+                currentTurretPose -= incTurret;
+            }
+            robot.telemetry.addData("Increment:", incTurret);
+            robot.telemetry.addData("Arm Current Value:", currentTurretPose);
+            robot.telemetry.update();
+
         }
     }
 }

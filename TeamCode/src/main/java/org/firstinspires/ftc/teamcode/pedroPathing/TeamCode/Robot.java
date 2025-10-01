@@ -53,6 +53,8 @@ public class Robot {
     public Servo servoArmLeft; // Elbow or Arm
     public Servo servoArmRight; // Elbow or Arm
 
+    public Servo servoTurret; //turret for decode season
+
     //public CRServo servoArm; // Elbow or Arm
     public Servo servoWrist; // Wrist
 

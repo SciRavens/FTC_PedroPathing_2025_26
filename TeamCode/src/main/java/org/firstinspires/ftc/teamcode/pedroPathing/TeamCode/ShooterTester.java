@@ -31,7 +31,7 @@ import com.pedropathing.follower.Follower;
 
 @TeleOp(name = "ShooterTester", group = "Examples")
 public class ShooterTester extends OpMode {
-    public Robot robot;
+    public Robot robot, telemetry;
 
     public DcMotorEx DcMotorShooter;
     private static double DEAD_ZONE = 0.1;
@@ -49,14 +49,19 @@ public class ShooterTester extends OpMode {
     public void init() {
 
         DcMotorShooter = hardwareMap.get(DcMotorEx.class, "shooterMotor");
-
+        DcMotorShooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         DcMotorShooter.setDirection(DcMotorSimple.Direction.FORWARD);
     }
 
     @Override
     public void loop() {
         if(gamepad1.left_stick_y != 0){
-            DcMotorShooter.setPower(-gamepad1.left_stick_y);
+//            double targetRPM = 5000.0;
+//            double targetTPS = (targetRPM / 60.0) * 100;
+//            DcMotorShooter.setPower(-gamepad1.left_stick_y);
+            DcMotorShooter.setVelocity(-gamepad1.left_stick_y);
+            double currentVelocity = DcMotorShooter.getVelocity();
+            robot.telemetry.addData("Current RPM: ", currentVelocity);
         }
         if (gamepad1.a) {
             BallShooterFar();

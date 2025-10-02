@@ -27,7 +27,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.constants.LConstants;
  * @version 2.0, 12/30/2024
  */
 
-@TeleOp(name = "RobotTeleop", group = "Examples")
+@TeleOp(name = "RobotTeleop")
 public class RobotTeleop extends OpMode {
     public Robot robot;
     //public DriveTrain DT;

@@ -82,20 +82,16 @@ public class ShooterTester extends OpMode {
             BallShooterNear();
         }
         else if (gamepad1.dpad_left){
-            if (currentTurretPose < 0.9) {
-                currentTurretPose += incTurret;
-            }
+            currentTurretPose += incTurret;
         }
         else if (gamepad1.dpad_right) {
-            if (currentTurretPose > 0.1) {
-                currentTurretPose -= incTurret;
-            }
-            turret.setTarget(currentTurretPose);
-            turret.apply();
-            robot.telemetry.addData("Increment:", incTurret);
-            robot.telemetry.addData("Arm Current Value:", currentTurretPose);
-            robot.telemetry.update();
-
+            currentTurretPose -= incTurret;
         }
+        turret.setTarget(currentTurretPose);
+        turret.apply();
+        robot.telemetry.addData("Increment:", incTurret);
+        robot.telemetry.addData("Arm Current Value:", currentTurretPose);
+        robot.telemetry.update();
+
     }
 }

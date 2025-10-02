@@ -33,7 +33,7 @@ import com.pedropathing.follower.Follower;
 
 @TeleOp(name = "ShooterTester", group = "Examples")
 public class ShooterTester extends OpMode {
-    public Robot robot, telemetry;
+//    public Robot robot, telemetry;
 
     public DcMotorEx DcMotorShooter;
     public Turret turret;
@@ -70,28 +70,36 @@ public class ShooterTester extends OpMode {
 //            double targetRPM = 5000.0;
 //            double targetTPS = (targetRPM / 60.0) * 100;
 //            DcMotorShooter.setPower(-gamepad1.left_stick_y);
-            DcMotorShooter.setVelocity(-gamepad1.left_stick_y);
-            double currentVelocity = DcMotorShooter.getVelocity();
-            robot.telemetry.addData("Current RPM: ", currentVelocity);
-            robot.telemetry.update();
+            DcMotorShooter.setPower(-gamepad1.left_stick_y);
+
         }
-        else if (gamepad1.a) {
-            BallShooterFar();
-        }
-        else if (gamepad1.b) {
-            BallShooterNear();
-        }
-        else if (gamepad1.dpad_left){
+        double currentVelocity = DcMotorShooter.getVelocity();
+        telemetry.addData("Current RPM: ", currentVelocity);
+//        telemetry.update();
+         if (gamepad1.a) {
+            DcMotorShooter.setVelocity(1460);
+//         } else if (gamepad1.b) {
+//             DcMotorShooter.setVelocity(1400);
+         } else if (gamepad1.x) {
+             DcMotorShooter.setVelocity(1000);
+         } else if (gamepad1.y) {
+             DcMotorShooter.setVelocity(1200);
+         }
+
+//        else if (gamepad1.b) {
+//            BallShooterNear();
+//        }
+        if (gamepad1.dpad_left){
             currentTurretPose += incTurret;
         }
         else if (gamepad1.dpad_right) {
             currentTurretPose -= incTurret;
         }
-        turret.setTarget(currentTurretPose);
-        turret.apply();
-        robot.telemetry.addData("Increment:", incTurret);
-        robot.telemetry.addData("Arm Current Value:", currentTurretPose);
-        robot.telemetry.update();
+//        turret.setTarget(currentTurretPose);
+//        turret.apply();
+        telemetry.addData("Increment:", incTurret);
+        telemetry.addData("Arm Current Value:", currentTurretPose);
+        telemetry.update();
 
     }
 }

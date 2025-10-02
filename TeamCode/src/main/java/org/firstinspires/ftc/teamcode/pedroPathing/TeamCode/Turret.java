@@ -1,43 +1,30 @@
 package org.firstinspires.ftc.teamcode.pedroPathing.TeamCode;
-import android.sax.StartElementListener;
 
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.sun.source.doctree.StartElementTree;
-
-import androidx.annotation.NonNull;
-
-
-
+import com.qualcomm.robotcore.hardware.Servo;
 
 public class Turret {
-    private Robot robot;
-    private double target;
-    private boolean speed_control = false;
-    private double max_speed = 0.5; //0.1
-    private double threshold = 0.005;
-    private final double P = 0.03;
+    private final Servo servoTurret;
+    private double target = 0.5;
 
-    private double cur_pos = 0.0;
-
-    public Turret(Robot robot) {
-        this.robot = robot;
-        cur_pos = robot.servoTurret.getPosition();
-        target = cur_pos;
-    }
-    public double getCurPos()
-    {
-        return robot.servoTurret.getPosition();
-    }
-    private void setSCTarget(double target) {
-        speed_control = true;
-        this.target = target;
+    public Turret(Servo servoTurret) {
+        this.servoTurret = servoTurret;
+        this.target = servoTurret.getPosition();
     }
 
-        //robot.telemetry.addData("Arm Curr Pos:", robot.servoArmLeft.getPosition());
-        //robot.telemetry.addData("Arm Target:", this.target);
-        //robot.telemetry.addData("Arm Speed Control: ", speed_control);
+    public double getPosition() {
+        return servoTurret.getPosition();
     }
 
+    public void setTarget(double target) {
+        this.target = clamp(target, 0.0, 1.0);
+    }
 
+    public void apply() {
+        // For now, directly set the position. Later you can add speed limiting/P-control.
+        servoTurret.setPosition(target);
+    }
 
-
+    private double clamp(double v, double min, double max) {
+        return Math.max(min, Math.min(max, v));
+    }
+}

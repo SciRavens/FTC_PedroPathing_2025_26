@@ -8,6 +8,8 @@ import com.pedropathing.pathgen.BezierLine;
 import  com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.Servo;
+
 
 import com.pedropathing.pathgen.PathChain;
 import com.pedropathing.pathgen.Point;
@@ -55,6 +57,11 @@ public class ShooterTester extends OpMode {
         DcMotorShooter = hardwareMap.get(DcMotorEx.class, "shooterMotor");
         DcMotorShooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         DcMotorShooter.setDirection(DcMotorSimple.Direction.FORWARD);
+        Servo rawTurret = hardwareMap.get(Servo.class, "servoTurret");
+        turret = new Turret(rawTurret);
+        turret.setTarget(0.5);
+        turret.apply();
+
     }
 
     @Override
@@ -83,6 +90,8 @@ public class ShooterTester extends OpMode {
             if (currentTurretPose > 0.1) {
                 currentTurretPose -= incTurret;
             }
+            turret.setTarget(currentTurretPose);
+            turret.apply();
             robot.telemetry.addData("Increment:", incTurret);
             robot.telemetry.addData("Arm Current Value:", currentTurretPose);
             robot.telemetry.update();

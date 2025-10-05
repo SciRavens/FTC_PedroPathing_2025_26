@@ -20,7 +20,6 @@ public class Turret {
     }
 
     public void apply() {
-        // For now, directly set the position. Later you can add speed limiting/P-control.
         servoTurret.setPosition(target);
     }
 

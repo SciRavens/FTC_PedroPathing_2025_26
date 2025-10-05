@@ -16,6 +16,11 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
+
 import org.firstinspires.ftc.teamcode.pedroPathing.TeamCode.Robot;
 import org.firstinspires.ftc.teamcode.pedroPathing.constants.FConstants;
 import org.firstinspires.ftc.teamcode.pedroPathing.constants.LConstants;
@@ -27,7 +32,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.constants.LConstants;
  * @version 2.0, 12/30/2024
  */
 
-@TeleOp(name = "RobotTeleop")
+@TeleOp(name = "RobotTeleop", group = "Examples")
 public class RobotTeleop extends OpMode {
     public Robot robot;
     //public DriveTrain DT;
@@ -50,6 +55,11 @@ public class RobotTeleop extends OpMode {
     private static double DEAD_ZONE = 0.1;
 
     private final Pose startPose = new Pose(0,0,0);
+    public DcMotorEx DcMotorShooter;
+    public Turret turret;
+    public double initialTurretPose = 0.5;
+    public double currentTurretPose = initialTurretPose;
+    public double incTurret = 0.01;
 
     /** This method is call once when init is played, it initializes the follower **/
     @Override
@@ -57,6 +67,13 @@ public class RobotTeleop extends OpMode {
         follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
         follower.setStartingPose(startPose);
         buildPath();
+        DcMotorShooter = hardwareMap.get(DcMotorEx.class, "shooterMotor");
+        DcMotorShooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        DcMotorShooter.setDirection(DcMotorSimple.Direction.FORWARD);
+        Servo rawTurret = hardwareMap.get(Servo.class, "servoTurret");
+        turret = new Turret(rawTurret);
+        turret.setTarget(0.5);
+        turret.apply();
     }
 
     public void runOpMode() throws InterruptedException {
@@ -82,6 +99,63 @@ public class RobotTeleop extends OpMode {
         robot.telemetry.update();
     }
 
+    private void follower_operate() {
+        boolean strafeOnly = false;
+        double xInput = Math.abs(gamepad1.left_stick_x) > DEAD_ZONE ? gamepad1.left_stick_x : 0;
+        double yInput = Math.abs(gamepad1.left_stick_y) > DEAD_ZONE ? gamepad1.left_stick_y : 0;
+
+        if (gamepad1.right_trigger > 0.5) {
+            follower.setMaxPower(0.25);
+        } else if (gamepad1.left_trigger > 0.5) {
+            strafeOnly = true;
+            if (!strafeHeadingOn) {
+                strafeHeading = follower.getPose().getHeading();
+            }
+            // Heading correction
+            double imuHeading = follower.getPose().getHeading();
+            double headingError = strafeHeading - imuHeading; // Target heading is initialized when strafing starts
+            double correction = Kp_strafing * headingError;
+
+            // Adjust movement with IMU and drift correction
+            follower.setTeleOpMovementVectors(xInput, yInput, correction);
+        } else {
+            follower.setMaxPower(1.0);
+        }
+        if (!strafeOnly) {
+            strafeHeadingOn = false;
+            follower.setTeleOpMovementVectors(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x);
+        }
+        follower.update();
+
+        if (gamepad2.dpad_down) {
+            arm.setPosSampleTwo(false);
+            wrist.setPosSampleTwo(false);
+        } else if (gamepad2.y) {
+            arm.setPosBasket(false);
+            wrist.setPosBasket(false);
+//                clawAngle.setHorizontal();
+//                slider.HighBasket();
+        } else if (gamepad2.x) {
+//                clawAngle.setHorizontal();
+            arm.setPosStarting(false);
+            wrist.setPosStarting(false);
+//                slider.InitialPose();
+        } else if (gamepad2.b) {
+            arm.setPosSpecimen(false);
+            wrist.setPosSpecimen(false);
+        } else if (gamepad2.a) {
+            arm.setPosSample(false);
+            wrist.setPosSample(false);
+        } else if (gamepad2.dpad_left) {
+//                clawAngle.setHorizontal();
+        } else if (gamepad2.dpad_right) {
+//                clawAngle.setVertical();
+        } else if (gamepad2.dpad_up) {
+//                slider.LowChamber();
+            arm.setPosChamberBack(false);
+            wrist.setPosChamberBack(false);
+        }
+    }
 
     public Pose testPath = new Pose(-40,20,Math.toRadians(90));
     public PathChain randomPath;
@@ -122,7 +196,23 @@ public class RobotTeleop extends OpMode {
         if(gamepad1.a) {
             buildPath();
             follower.followPath(randomPath,true);
+            DcMotorShooter.setVelocity(1460);
         }
+        else if (gamepad1.b) {
+            DcMotorShooter.setVelocity(1400);
+        }
+        else if (gamepad1.x) {
+            DcMotorShooter.setVelocity(1000);
+        }
+        else if (gamepad1.y) {
+            DcMotorShooter.setVelocity(1200);
+        } else if (gamepad1.dpad_right) {
+            currentTurretPose += incTurret;
+        } else if (gamepad1.dpad_left) {
+            currentTurretPose -= incTurret;
+        }
+        turret.setTarget(currentTurretPose);
+        turret.apply();
 
         follower.setTeleOpMovementVectors(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, true);
         follower.update();
@@ -131,38 +221,10 @@ public class RobotTeleop extends OpMode {
         telemetry.addData("X", follower.getPose().getX());
         telemetry.addData("Y", follower.getPose().getY());
         telemetry.addData("Heading in Degrees", Math.toDegrees(follower.getPose().getHeading()));
-
+        double currentVelocity = DcMotorShooter.getVelocity();
+        telemetry.addData("Current RPM:", currentVelocity);
         /* Update Telemetry to the Driver Hub */
         telemetry.update();
-
-        if (gamepad2.dpad_down) {
-            arm.setPosSampleTwo(false);
-            wrist.setPosSampleTwo(false);
-        } else if (gamepad2.y) {
-            arm.setPosBasket(false);
-            wrist.setPosBasket(false);
-//                clawAngle.setHorizontal();
-//                slider.HighBasket();
-        } else if (gamepad2.x) {
-//                clawAngle.setHorizontal();
-            arm.setPosStarting(false);
-            wrist.setPosStarting(false);
-//                slider.InitialPose();
-        } else if (gamepad2.b) {
-            arm.setPosSpecimen(false);
-            wrist.setPosSpecimen(false);
-        } else if (gamepad2.a) {
-            arm.setPosSample(false);
-            wrist.setPosSample(false);
-        } else if (gamepad2.dpad_left) {
-//                clawAngle.setHorizontal();
-        } else if (gamepad2.dpad_right) {
-//                clawAngle.setVertical();
-        } else if (gamepad2.dpad_up) {
-//                slider.LowChamber();
-            arm.setPosChamberBack(false);
-            wrist.setPosChamberBack(false);
-        }
 
     }
 

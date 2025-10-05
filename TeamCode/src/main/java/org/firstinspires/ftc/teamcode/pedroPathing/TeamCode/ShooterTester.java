@@ -66,7 +66,7 @@ public class ShooterTester extends OpMode {
 
     @Override
     public void loop() {
-        if(gamepad1.left_stick_y != 0){
+        if(gamepad1.left_stick_y != 0){ // code for shooter motor
 //            double targetRPM = 5000.0;
 //            double targetTPS = (targetRPM / 60.0) * 100;
 //            DcMotorShooter.setPower(-gamepad1.left_stick_y);
